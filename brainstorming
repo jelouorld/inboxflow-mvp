@@ -1,0 +1,79 @@
+
+idempotency: 
+    hash (email+attachment) 
+        use it as key for indexing both in raw storage in S3 and in processed storage in DynamoDB 
+
+confidence score 
+    field level confidence 
+
+Mapping Layer:
+
+    we need a mapping between an standard model we expect to get and an ERP system or whatver data destination will do . 
+
+    also:
+        can we define standard supported documents? 
+            for example: 
+                stocks
+                delivery orders 
+                invoices
+
+
+first storage layer:
+
+SES → S3 (raw email)
+
+s3://bucket/{tenant_id}/{message_id}/
+  ├── email.eml
+  └── attachments/*
+
+
+where the hell to 
+
+
+--------------------------------------------------------------
+
+1. Idempotency → no duplicate side effects
+2. Queues → control flow, not just scaling
+3. S3 raw storage → replayability
+4. Confidence gating → avoid bad automation
+5. Audit log → debuggability
+
+
+-------------------------------------------------------------
+REAL PAINS:
+
+Textract cost / latency
+    need somehow a feed back look and template generating
+        so we can lower the costs of known documents. 
+            the systems need to be eventually consistent 
+            may be not consistent from scratch 
+            it can have some sort of stagin area
+                where we can replay processing tweaking parameters 
+                    and feeding with some templates or somehting like that 
+                        that could serve as a form of directing. 
+
+    
+    like populating a mapping table 
+    
+    or like how networks insert paths in their routing tables 
+        
+    - we need somehow a bootstrapping mechanism 
+       where we teach the user how to extract the data 
+        but in the bootstraping mechanism, we can be aided by the AI itself.. 
+
+        not sure yet how are we going to do that
+            what i do know is that this part is strogly dependant on theh ai 
+                specigic algorithm itself and the document.
+
+    
+    the thing is that 
+    1 client can have n documents of the same form, and onve everything is setup, he can benefit from the automation. 
+
+
+parsing correctness
+
+idempotency
+
+multi-tenant isolation
+    I dont care: plugin architecture 
+    I can put an  event bridge with a rule and have one lambda per erp system. 
